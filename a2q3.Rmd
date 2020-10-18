@@ -1,0 +1,140 @@
+---
+title: "304a2"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Part 1
+
+(a)
+```{r}
+N1 <- 120
+n1 <- 6
+N2 <- 180
+n2 <- 9
+total_x1 <- 24500
+total_x2 <- 21200
+x1 <- c(204, 143, 82, 256, 275, 198)
+x2 <- c(137, 189, 119, 63, 103, 107, 159, 63, 87)
+y1 <- c(210, 160, 75, 280, 300, 190)
+y2 <- c(150, 200, 125, 60, 110, 100, 180, 75, 90)
+x_mean1 <- mean(x1)
+x_mean2 <- mean(x2)
+y_mean1 <- mean(y1)
+y_mean2 <- mean(y2)
+
+total_y_hat <- N1 * y_mean1 + N2 * y_mean2
+total_y_hat
+
+s2_1 <- var(y1)
+s2_2 <- var(y2)
+
+var_hat_total_y_hat <- N1 ^ 2 * (1 - n1 / N1) * (s2_1 / n1) + N2 ^ 2 * (1 - n2 / N2) * (s2_2 / n2)
+var_hat_total_y_hat
+```
+Therefore, the basic estimate of the total potential is 46100
+The Variance of my estimator is: 23075975
+
+(b)
+```{r}
+r1 <- y_mean1 / x_mean1
+r2 <- y_mean2 / x_mean2
+total_y_sr_hat <- r1 * total_x1 + r2 * total_x2
+total_y_sr_hat
+
+sr2_1 <- var(y1 - r1 * x1)
+sr2_2 <- var(y2 - r2 * x2)
+var_total_y_hat_sr_hat <- N1 ^ 2 * (1 - n1 / N1) * sr2_1 / n1 + N2 ^ 2 * (1 - n2 / N2) * sr2_2 / n2
+var_total_y_hat_sr_hat
+```
+Therefore, the ratio estimate of the total potential sales is: 48206.45
+The variance of my estimator is: 564612.8
+
+(c)
+```{r}
+fitreg1 <- lm(y1~x1)
+mu_y_reg1_hat <- y_mean1 + coef(fitreg1)[2] * ((total_x1 / N1) - x_mean1)
+fitreg2 <- lm(y2~x2)
+mu_y_reg2_hat <- y_mean2 + coef(fitreg2)[2] * ((total_x2 / N2) - x_mean2)
+
+total_y_reg_hat <- N1 * mu_y_reg1_hat + N2 * mu_y_reg2_hat
+total_y_reg_hat
+
+y_hat1 <- fitted(fitreg1)
+MSE1 <- sum((y1 - y_hat1) ^ 2)/(n1 - 2)
+y_hat2 <- fitted(fitreg2)
+MSE2 <- sum((y2 - y_hat2) ^ 2)/(n2 - 2)
+
+var_hat_total_y_reg_hat <- N1 ^ 2 * (1 - n1 / N1) * MSE1 / n1 + N2 ^ 2 * (1 - n2 / N2) * MSE2 / n2
+var_hat_total_y_reg_hat
+```
+The regression estimate of the total potential sales is: 48353.87
+The Variance of this estimate is: 558098.7
+
+(d)
+```{r}
+realative_efficency_ratio2basic <- var_hat_total_y_hat/var_total_y_hat_sr_hat
+realative_efficency_ratio2basic
+```
+The ratio is greater than 1. Ratio estimation is better than the basic estimation.
+```{r}
+realative_efficency_ratio2reg <- var_hat_total_y_reg_hat/var_total_y_hat_sr_hat
+realative_efficency_ratio2reg
+```
+The ratio is less than 1. Regression estimation is better than the ratio estimation.
+```{r}
+relative_efficiency_reg2basic <- var_hat_total_y_hat/var_hat_total_y_reg_hat
+relative_efficiency_reg2basic
+```
+The ratio is greater than 1. Regression estimation is better than the basic estimation.
+
+(e)
+We can see from part (d) that overall regression estimation behaves better. However, there is not many differences between the performance of regression estimation and ratio estimation. Therefore, when their results are similar, I would recommand the ratio estimation. Because there are too many calculations during the regression estimation.
+
+
+Part2
+
+(a)
+```{r}
+mu_y_hat <- total_y_hat / (N1 + N2)
+mu_y_hat
+
+var_hat_mu_y_hat <- var_hat_total_y_hat / ((N1 + N2) ^ 2) 
+var_hat_mu_y_hat
+
+```
+The basic estimate of the mean potential sales is: 153.6667
+The variance of this estimate is: 256.3997
+
+(b)
+```{r}
+x_barst <- N1 / (N1 + N2) * x_mean1 + N2 / (N1 + N2) * x_mean2
+y_barst <- N1 / (N1 + N2) * y_mean1 + N2 / (N1 + N2) * y_mean2
+mu_x <- (total_x1 + total_x2) / (N1 + N2)
+r <- y_barst / x_barst
+mu_y_hat <- r * mu_x
+mu_y_hat
+
+sr2_1 <- var(y1 - r * x1)
+sr2_2 <- var(y2 - r * x2)
+
+var_mu_y_hat_sr_hat <- (N1 / (N1 + N2))  ^  2 * (1 - n1 / N1) * sr2_1 / n1 + (N2 / (N1 + N2)) ^ 2 * (1 - n2 / N2) * sr2_2 / n2
+var_mu_y_hat_sr_hat
+```
+The ratio estimate of the mean potential sales is: 160.6995
+The variance of the estimate is: 6.189945
+
+(d)
+```{r}
+relative_efficiency <- var_hat_mu_y_hat/var_mu_y_hat_sr_hat
+relative_efficiency
+```
+The relative efficiency of ratio estimation to basic estimation is: 41.42197
+
+(e)
+Since the relative efficiency is greater than 1. Ratio estimation is better.
